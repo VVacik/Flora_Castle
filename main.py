@@ -26,8 +26,12 @@ while running:
                     screen = pygame.display.set_mode((1280, 720))
 
                     level_manager.recalc_layout(screen)
+            level_manager.player.handle_event(event)
 
+
+    level_manager.update(dt)
     level_manager.draw(screen)
+
 
     pygame.display.flip()
     dt = clock.tick(60) / 1000

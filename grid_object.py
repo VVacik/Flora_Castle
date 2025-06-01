@@ -48,3 +48,41 @@ class Grid_Object(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft=(self.x, self.y))
         self.update_pixel_position()
 
+    def animated_move(self, dx, dy):
+        if self.animating:
+            return
+
+        new_x = self.grid_x +dx
+        new_y = self.grid_y +dy
+
+        self.animating = True
+
+        self.animation_time_elapsed = 0.0
+
+        self.animation_start_pos = (self.x, self.y)
+
+        self.grid_x, self.grid_y = new_x, new_y
+
+        end_x = self.grid_x * self.tile_size +self.x_offset
+        end_y = self.grid_y * self.tile_size +self.y_offset
+        self.animation_end_pos = (end_x, end_y)
+
+
+    def update(self, dt):
+        if self.animating:
+            self.animation_time_elapsed += dt
+
+            progress = min(self.animation_time_elapsed / self.animation_duration, 1.0)
+
+            start_x, start_y = self.animation_start_pos
+            end_x, end_y = self.animation_end_pos
+            self.x = start_x + (end_x - start_x) * progress
+            self.y = start_y + (end_y - start_y) * progress
+
+            self.rect.topleft = (self.x, self.y)
+
+            if progress >= 1.0:
+                self.animating = False
+                self.x, self.y = end_x, end_y
+                self.rect.topleft = (self.x, self.y)
+

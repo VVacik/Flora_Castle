@@ -1,6 +1,7 @@
 from assets import *
 import pygame
 from room import Room
+from player import Player
 
 
 class LevelManager:
@@ -20,10 +21,32 @@ class LevelManager:
             exits={}
         )
 
+        self.player = Player(
+            grid_position=room1.player_start,
+            tile_size= room1.TILE_SIZE,
+            movable_objects_group= room1.movable_group,
+            image=PLAYER_IMG_FRONT,
+            is_blocked =self.is_blocked
+
+        )
+
+
+        self.player_group = pygame.sprite.GroupSingle(self.player)
+        self.player.resize(room1.TILE_SIZE)
+        self.player.set_offset(room1.x_offset, room1.y_offset)
+
         self.current_room = room1
 
     def draw(self,surface):
         self.current_room.draw(surface)
+        self.player_group.draw(surface)
+
+    def is_blocked(self,x,y):
+        return
+
+    def update(self,dt):
+        self.player_group.update(dt)
+        #self.current_room.update(dt)
 
 
     def recalc_layout(self):
