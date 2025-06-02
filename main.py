@@ -25,7 +25,7 @@ while running:
                 else:
                     screen = pygame.display.set_mode((1280, 720))
 
-                    level_manager.recalc_layout(screen)
+                level_manager.recalc_layout()
             level_manager.player.handle_event(event)
 
 

@@ -26,7 +26,8 @@ class LevelManager:
             tile_size= room1.TILE_SIZE,
             movable_objects_group= room1.movable_group,
             image=PLAYER_IMG_FRONT,
-            is_blocked =self.is_blocked
+            is_blocked =self.is_blocked,
+            current_room=room1
 
         )
 
@@ -46,7 +47,8 @@ class LevelManager:
 
     def update(self,dt):
         self.player_group.update(dt)
-        #self.current_room.update(dt)
+        self.current_room.update(dt)
+
 
 
     def recalc_layout(self):

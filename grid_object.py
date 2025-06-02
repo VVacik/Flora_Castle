@@ -44,7 +44,7 @@ class Grid_Object(pygame.sprite.Sprite):
 
     def resize(self, new_tile_size):
         self.tile_size = new_tile_size
-        self.original_image = pygame.transform.scale(self.original_image, (self.tile_size, self.tile_size))
+        self.image = pygame.transform.scale(self.original_image, (self.tile_size, self.tile_size))
         self.rect = self.image.get_rect(topleft=(self.x, self.y))
         self.update_pixel_position()
 
