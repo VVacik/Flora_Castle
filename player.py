@@ -21,22 +21,69 @@ class Player(Grid_Object):
         self.set_current_room(current_room)
 
 
-        self.images = {
+        self.static_images = {
             "front": PLAYER_IMG_FRONT,
             "back": PLAYER_IMG_BACK,
             "left": PLAYER_IMG_LEFT,
             "right": PLAYER_IMG_RIGHT,
         }
 
+        self.animation_frames = {
+            "front": [PLAYER_IMG_FRONT_A1, PLAYER_IMG_FRONT_A2],
+            "back": [PLAYER_IMG_BACK_A1, PLAYER_IMG_BACK_A2],
+            "left": [PLAYER_IMG_LEFT_A],
+            "right": [PLAYER_IMG_RIGHT_A]
+        }
+
+
+
+        self.current_frame = 0
+        self.animation_speed = 6
+        self.animation_counter = 0
+        self.images = self.static_images
+
     def set_current_room(self, current_room):
         self.current_room = current_room
 
-    def update_sprite_direction(self):
+    def update(self, dt):
 
+        super().update(dt)
+        self.update_animation()
+
+    def update_sprite_direction(self):
         direction = direction_map.get(self.facing)
 
-        self.original_image = self.images[direction]
+        if self.animating:
+
+            frames = self.animation_frames[direction]
+            self.original_image = frames[self.current_frame % len(frames)]
+        else:
+
+            self.original_image = self.static_images[direction]
+
         self.resize(self.tile_size)
+
+    def resize(self, new_tile_size):
+        self.tile_size = new_tile_size
+        self.image = pygame.transform.scale(self.original_image, (self.tile_size, self.tile_size))
+        self.rect = self.image.get_rect(topleft=(self.x, self.y))
+
+
+
+
+    def update_animation(self):
+
+        if self.animating:
+            self.animation_counter += 1
+            if self.animation_counter >= self.animation_speed:
+                self.animation_counter = 0
+                self.current_frame += 1
+                self.update_sprite_direction()
+        else:
+            # Reset animacji gdy gracz przestaje się ruszać
+            self.current_frame = 0
+            self.animation_counter = 0
+            self.update_sprite_direction()
 
 
     def handle_event(self, event):
@@ -60,19 +107,13 @@ class Player(Grid_Object):
 
     def can_move_to_position(self, new_grid_x, new_grid_y):
 
-
-
         if not (0 <= new_grid_x < self.screen_w and 0 <= new_grid_y < self.screen_h):
-            print("Debug")
             return False
-
-
 
 
         temp_screen_x = self.current_room.x_offset + new_grid_x * self.current_room.TILE_SIZE
         temp_screen_y = self.current_room.y_offset + new_grid_y * self.current_room.TILE_SIZE
         temp_rect = pygame.Rect(temp_screen_x, temp_screen_y, self.current_room.TILE_SIZE, self.current_room.TILE_SIZE)
-
 
 
         if self.current_room.check_collision(temp_rect):
@@ -81,8 +122,6 @@ class Player(Grid_Object):
         return True
 
     def check_door_interaction(self):
-
-
 
             # Stwórz prostokąt na aktualnej pozycji gracza
         current_screen_x = self.current_room.x_offset + self.grid_x * self.current_room.TILE_SIZE
@@ -98,18 +137,17 @@ class Player(Grid_Object):
 
         return None
 
-
-
     def move(self, dx, dy):
-
         if self.animating:
             return
 
         new_player_x = self.grid_x + dx
         new_player_y = self.grid_y + dy
 
-
         if self.can_move_to_position(new_player_x, new_player_y):
+            # Zapisz docelową pozycję
+            self.target_grid_x = new_player_x
+            self.target_grid_y = new_player_y
 
             self.animated_move(dx, dy)
             self.check_door_interaction()

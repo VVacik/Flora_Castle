@@ -16,6 +16,8 @@ class Grid_Object(pygame.sprite.Sprite):
         self.y_offset = 0
         self.rect = self.image.get_rect()
 
+
+
         #Pobierane znowu!!!!
         self.screen_w, self.screen_h = pygame.display.get_surface().get_size()
 
@@ -23,7 +25,7 @@ class Grid_Object(pygame.sprite.Sprite):
         self.animating = False
         self.animation_start_pos = (0,0)
         self.animation_end_pos = (0,0)
-        self.animation_duration = 0.1
+        self.animation_duration = 0.3
         self.animation_time_elapsed = 0.0
 
         #Pozycja w pikselach:

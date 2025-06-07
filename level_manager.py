@@ -50,7 +50,6 @@ class LevelManager:
         self.current_room.update(dt)
 
 
-
     def recalc_layout(self):
         self.current_room.recalc_layout()
 
@@ -58,3 +57,8 @@ class LevelManager:
         x_offset = self.current_room.x_offset
         y_offset = self.current_room.y_offset
         screen_w, screen_h = self.current_room.surface_width, self.current_room.surface_height
+
+        self.player.set_offset(x_offset, y_offset)
+        self.player.resize(new_tile_size)
+        self.player.update_pixel_position()
+

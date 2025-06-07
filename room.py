@@ -68,14 +68,14 @@ class Room:
             screen_y = self.y_offset + y * self.TILE_SIZE
 
             collision_rect = pygame.Rect(screen_x, screen_y, self.TILE_SIZE, self.TILE_SIZE)
-            print(collision_rect)
+
 
         for x, y in self.door_tiles:
             screen_x = self.x_offset + x * self.TILE_SIZE
             screen_y = self.y_offset + y * self.TILE_SIZE
 
             door_rect = pygame.Rect(screen_x, screen_y, self.TILE_SIZE, self.TILE_SIZE)
-            print(door_rect)
+
 
 
     #Metoda Przeliczająca rozmiary spritów w zależności od rozmiaru ekranu
@@ -103,7 +103,7 @@ class Room:
             tile = Tile((screen_x, screen_y), scaled_img)
             self.tile_group.add(tile)
 
-        #self.create_collision_hitboxes()
+        self.create_collision_hitboxes()
 
     def get_collision_rects(self):
         """Zwraca listę prostokątów kolizji"""
@@ -151,7 +151,6 @@ class Room:
         return
 
     def draw_debug_hitboxes(self, surface):
-        """Rysuje hitboxy dla debugowania (opcjonalne)"""
 
         # Rysuj drzwi na niebiesko
         for rect in self.get_door_rects():

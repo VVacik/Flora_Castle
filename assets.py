@@ -19,3 +19,12 @@ PLAYER_IMG_LEFT = load_image("left_idle.png")
 PLAYER_IMG_RIGHT = load_image("right_idle.png")
 TILE_IMG = load_image("Tile.png")
 ROCK_IMG = load_image("rock.png")
+
+PLAYER_IMG_BACK_A1 = load_image("back_walking_1.png")
+PLAYER_IMG_BACK_A2 = load_image("back_walking_2.png")
+
+PLAYER_IMG_FRONT_A1 = load_image("front_walking_1.png")
+PLAYER_IMG_FRONT_A2 = load_image("front_walking_2.png")
+
+PLAYER_IMG_LEFT_A = load_image("left_walking.png")
+PLAYER_IMG_RIGHT_A = load_image("right_walking.png")
