@@ -5,6 +5,7 @@ from tile import Tile
 from assets import *
 
 
+
 class Room:
     def __init__(self, player_start, map_path, movable_group, exits):
         #parametry pobrane z konstruktora
@@ -37,6 +38,7 @@ class Room:
         #Wywoływane metody przy tworzeniu pokoju:
         self.load_tiles_from_map()
         self.recalc_layout()
+        print(movable_group)
 
 
     def load_tiles_from_map(self):
@@ -58,10 +60,10 @@ class Room:
                                     self.tiles_info.append((x, y, tile_img))
 
 
+
     def create_collision_hitboxes(self):
 
-        self.collision_group = pygame.sprite.Group()
-        self.door_group = pygame.sprite.Group()
+
 
         for x, y in self.collision_tiles:
             screen_x = self.x_offset + x * self.TILE_SIZE
@@ -75,6 +77,16 @@ class Room:
             screen_y = self.y_offset + y * self.TILE_SIZE
 
             door_rect = pygame.Rect(screen_x, screen_y, self.TILE_SIZE, self.TILE_SIZE)
+
+        for object in self.movable_group.sprites():
+            screen_x = self.x_offset + object.rect.x * self.TILE_SIZE
+            screen_y = self.y_offset + object.rect.y * self.TILE_SIZE
+
+            collision_rect = pygame.Rect(screen_x, screen_y, self.TILE_SIZE, self.TILE_SIZE)
+
+
+
+
 
 
 
@@ -105,6 +117,8 @@ class Room:
 
         self.create_collision_hitboxes()
 
+
+
     def get_collision_rects(self):
         """Zwraca listę prostokątów kolizji"""
         collision_rects = []
@@ -112,6 +126,10 @@ class Room:
             screen_x = self.x_offset + x * self.TILE_SIZE
             screen_y = self.y_offset + y * self.TILE_SIZE
             collision_rects.append(pygame.Rect(screen_x, screen_y, self.TILE_SIZE, self.TILE_SIZE))
+
+        for x in self.movable_group.sprites():
+            collision_rects.append(pygame.Rect(x.rect.x, x.rect.y, self.TILE_SIZE, self.TILE_SIZE))
+
         return collision_rects
 
     def get_door_rects(self):
@@ -158,7 +176,6 @@ class Room:
         # Rysuj kolizje na czerwono
         for rect in self.get_collision_rects():
             pygame.draw.rect(surface, (255, 0, 0, 100), rect, 2)
-
 
 
     def draw(self, surface):
