@@ -43,6 +43,9 @@ class Grid_Object(pygame.sprite.Sprite):
         # Wywoływane metody:
         self.set_offset(self.x_offset, self.y_offset)
 
+
+
+
     def update_pixel_position(self):
         # Pozycja logiczna (środek kafelka)
         self.x = self.grid_x * self.tile_size + self.x_offset

@@ -2,6 +2,8 @@ import pygame
 from Settings import *
 from grid_object import Grid_Object
 from assets import *
+from Movable_Object import Movable_Object
+from flower_pot import *
 
 direction_map = {0: "front", 1: "back", 2: "left", 3: "right"}
 directions = {1: (0, -1), 0: (0, 1), 2: (-1, 0), 3: (1, 0)}
@@ -15,7 +17,7 @@ doors = {
 }
 
 class Player(Grid_Object):
-    def __init__(self, grid_position, image,tile_size, is_blocked=None, collidable=True, movable_objects_group=None,
+    def __init__(self, grid_position, image,tile_size, collidable=True, movable_objects_group=None,
                  current_room=None):
         # Przesunięcia: X ma być na środku
         # Y przesunięty o 1/3 kafelka
@@ -24,10 +26,13 @@ class Player(Grid_Object):
 
 
 
-        super().__init__(grid_position,  image, tile_size, is_blocked, collidable, (render_offset_x, render_offset_y))
+
+
+        super().__init__(grid_position,  image, tile_size, collidable, (render_offset_x, render_offset_y))
 
         # Obiekty na planszy które gracz może złapać
         self.movable_objects_group = movable_objects_group
+
         self.held_object = None
 
         # Parametry dodatkowe:
@@ -35,6 +40,7 @@ class Player(Grid_Object):
         self.energy = 100
         self.current_room = current_room
         self.set_current_room(current_room)
+        self.harvested = 0
 
         self.static_images = {
             "front": PLAYER_IMG_FRONT,
@@ -125,7 +131,10 @@ class Player(Grid_Object):
 
 
         elif event.key == pygame.K_e and not self.held_object and self.movable_objects_group:
+
             self.pick_up(self.movable_objects_group)
+
+
 
         elif event.key == pygame.K_r and self.held_object:
             self.throw()
@@ -196,16 +205,9 @@ class Player(Grid_Object):
                 self.animated_move(dx, dy)
                 self.energy -= 5
 
-
-
-
-
         else:
             if self.can_move_to_position(new_player_x, new_player_y):
                 self.animated_move(dx, dy)
-
-
-
 
 
     def pick_up(self, objects_group):
@@ -216,13 +218,21 @@ class Player(Grid_Object):
 
 
         for obj in objects_group:
-            if obj.grid_x == target_x and obj.grid_y == target_y:
-                self.held_object = obj
-                self.held_object.original_image = ROCK_FLOATING.convert_alpha()
-                self.held_object.resize(self.tile_size)
-                self.held_object.animation_duration = 0.25
 
-                break
+            if isinstance(obj, Movable_Object):
+                if obj.grid_x == target_x and obj.grid_y == target_y:
+                    self.held_object = obj
+                    self.held_object.original_image = ROCK_FLOATING.convert_alpha()
+                    self.held_object.resize(self.tile_size)
+                    self.held_object.animation_duration = 0.25
+
+                    break
+            elif isinstance(obj, flower_pot):
+                if obj.grid_x == target_x and obj.grid_y == target_y:
+                    if obj.harvested == False:
+                        obj.harvest()
+                        self.harvested += 1
+
 
     def throw(self):
 

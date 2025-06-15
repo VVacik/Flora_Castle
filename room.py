@@ -7,11 +7,12 @@ from assets import *
 
 
 class Room:
-    def __init__(self, player_start, map_path, movable_group, exits):
+    def __init__(self, player_start, map_path, movable_group,exits, additional_col = None):
         #parametry pobrane z konstruktora
         self.player_start = player_start
         self.map_path = map_path
         self.movable_group = movable_group
+        self.additional_col = additional_col
         self.exits = exits
 
         # Trzymamy tu wymiary ekranu, Rozmiar kafelka, oraz przesunięcia ekranu
@@ -84,9 +85,12 @@ class Room:
 
                 collision_rect = pygame.Rect(screen_x, screen_y, self.TILE_SIZE, self.TILE_SIZE)
 
+        if self.additional_col is not None:
+            for object in self.additional_col.sprites():
+                screen_x = self.x_offset + object.rect.x * self.TILE_SIZE
+                screen_y = self.y_offset + object.rect.y * self.TILE_SIZE
 
-
-
+                collision_rect = pygame.Rect(screen_x, screen_y, self.TILE_SIZE, self.TILE_SIZE)
 
 
 
@@ -130,6 +134,10 @@ class Room:
         if self.movable_group is not None:
             for x in self.movable_group.sprites():
                 collision_rects.append(pygame.Rect(x.rect.x, x.rect.y, self.TILE_SIZE, self.TILE_SIZE))
+
+        if self.additional_col is not None:
+            for object in self.additional_col.sprites():
+                collision_rects.append(pygame.Rect(object.rect.x, object.rect.y, self.TILE_SIZE, self.TILE_SIZE))
 
         return collision_rects
 

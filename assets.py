@@ -20,6 +20,9 @@ PLAYER_IMG_RIGHT = load_image("right_idle.png")
 TILE_IMG = load_image("Tile.png")
 ROCK_IMG = load_image("rock.png")
 ROCK_FLOATING = load_image("rock_floating.png")
+TREE = load_image("tree.jpg")
+PLANT = load_image("plant_fresh.png")
+PLANT_HARVESTED = load_image("plant_harvested.png")
 
 MENU_IMG = load_image("menu.png")
 

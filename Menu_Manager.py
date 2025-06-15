@@ -42,6 +42,10 @@ class MenuManager:
             'pause': {
                 'title': 'PAUZA',
                 'options': ['Kontynuuj', 'Ustawienia', 'Menu Główne', 'Wyjście']
+            },
+            'WON': {
+                'title': "Won THE GAME",
+                'options': ['Menu Główne', "Wyjście"]
             }
         }
 
@@ -100,6 +104,7 @@ class MenuManager:
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  # Lewy przycisk myszy
+                print(self.select_option())
                 return self.select_option()
 
         return None
@@ -142,6 +147,12 @@ class MenuManager:
             elif selected_text == "Wyjście":
                 return "quit"
 
+        elif self.current_menu == "WON":
+            if selected_text == "Menu Główne":
+                return "main_menu"
+            elif selected_text == "Wyjście":
+                return "quit"
+
         return None
 
     def change_menu(self, new_menu):
@@ -149,6 +160,7 @@ class MenuManager:
         self.current_menu = new_menu
         self.selected_option = 0
         self.recalc_layout()
+        print(self.current_menu)
 
     def draw(self, screen):
         """Rysuje menu"""
@@ -180,7 +192,7 @@ class MenuManager:
                 text_color = self.colors['text']
 
             # Rysuj przycisk
-            pygame.draw.rect(screen, button_color, rect, border_radius=10)
+            pygame.draw.rect(screen, button_color, rect, width=2,border_radius=10)
             pygame.draw.rect(screen, text_color, rect, 2, border_radius=10)
 
             # Tekst opcji

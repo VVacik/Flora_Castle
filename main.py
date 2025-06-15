@@ -17,6 +17,8 @@ MENU = "menu"
 GAME = "game"
 PAUSE = "pause"
 
+WON = "WON"
+
 current_state = MENU
 level_manager = LevelManager()
 menu_manager = MenuManager(screen.get_width(), screen.get_height())
@@ -27,6 +29,7 @@ music = Music_Manager()
 dt = 0
 
 while running:
+    #screen.fill((0, 0, 0))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -62,7 +65,7 @@ while running:
             menu_manager.recalc_layout()
 
         # Obsługa zdarzeń w zależności od stanu gry
-        if current_state == MENU or current_state == PAUSE:
+        if current_state == MENU or current_state == PAUSE or current_state == WON:
             action = menu_manager.handle_event(event)
 
             if action == "start_game":
@@ -85,13 +88,21 @@ while running:
             elif action == "quit":
                 running = False
 
+
         elif current_state == GAME:
             # Przekaż zdarzenia do gry
             level_manager.player.handle_event(event)
 
+
+
+
     # Aktualizacja w zależności od stanu
     if current_state == GAME:
         level_manager.update(dt)
+        if level_manager.player.harvested == 3:
+            menu_manager.change_menu(WON)
+            current_state = WON
+
 
 
         music.play_track("assets/soundtrack.mp3")
@@ -108,10 +119,15 @@ while running:
             pause_text = font.render("ESC - Pauza", True, (255, 255, 255))
             screen.blit(pause_text, (10, 10))
 
-            Energy_level = font.render("Energy: ",True, (0, 150, 240) )
-            screen.blit(Energy_level, (20, 50))
-            Energy = font.render(str(level_manager.player.energy), True, (0, 150, 240))
-            screen.blit(Energy, (120, 50))
+            Energy_level = font.render("Energy: " + str(level_manager.player.energy),True, (0, 150, 240) )
+            screen.blit(Energy_level, (10, 50))
+
+            How_many_Flowers = font.render( "Zebrane Kwiatki: " +str(level_manager.player.harvested) + "/3", True, (0, 255, 240))
+            screen.blit(How_many_Flowers, (10, 100))
+    if current_state == WON:
+
+        menu_manager.draw(screen)
+
 
     pygame.display.flip()
     dt = clock.tick(60) / 1000

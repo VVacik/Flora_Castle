@@ -11,8 +11,6 @@ class Movable_Object(Grid_Object):
         self.throw_path = []
 
 
-
-
     def update(self, dt):
         super().update(dt)
 
