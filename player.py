@@ -7,6 +7,13 @@ direction_map = {0: "front", 1: "back", 2: "left", 3: "right"}
 directions = {1: (0, -1), 0: (0, 1), 2: (-1, 0), 3: (1, 0)}
 
 
+doors = {
+    "up" : ((7,1), (8,1)),
+    "right": ((12,4), (12, 5)),
+    "down": ((7, 8), (8,8)),
+    "left": ((3, 4), (3,5)),
+}
+
 class Player(Grid_Object):
     def __init__(self, grid_position, image,tile_size, is_blocked=None, collidable=True, movable_objects_group=None,
                  current_room=None):
@@ -48,18 +55,10 @@ class Player(Grid_Object):
         self.animation_counter = 0
         self.images = self.static_images
 
-        print(" ")
-
-        print(f"Pixel pos: ({self.x}, {self.y})")
-        print(f"Rect pos: ({self.rect.x}, {self.rect.y})")
-        print(" ")
-
     def set_current_room(self, current_room):
         self.current_room = current_room
 
     def update(self, dt):
-
-
         super().update(dt)
         self.update_animation()
 
@@ -92,6 +91,8 @@ class Player(Grid_Object):
 
     def update_animation(self):
         # Jeśli animacja trwa, Sprawdzaj czy ilość tików w animacji jest większa niż prędkość
+
+
         if self.animating:
             self.animation_counter += 1
             if self.animation_counter >= self.animation_speed:
@@ -169,6 +170,10 @@ class Player(Grid_Object):
         return None
 
     def move(self, dx, dy):
+
+        if self.check_door_interaction() is not None:
+            self.animating = False
+
         if self.animating:
             return
 
@@ -181,20 +186,25 @@ class Player(Grid_Object):
 
 
             obj_can_move = self.can_move_to_position(new_obj_x, new_obj_y, ignore=self.held_object)
-
-
             player_can_move = (self.can_move_to_position(new_player_x, new_player_y, ignore=self.held_object) or
                                (self.held_object.grid_x == new_player_x and self.held_object.grid_y == new_player_y))
 
-            if obj_can_move and player_can_move:
+            Have_energy = (self.energy > 0)
+
+            if obj_can_move and player_can_move and Have_energy:
                 self.held_object.animated_move(dx, dy)
                 self.animated_move(dx, dy)
-                self.check_door_interaction()
+                self.energy -= 5
+
+
+
+
 
         else:
             if self.can_move_to_position(new_player_x, new_player_y):
                 self.animated_move(dx, dy)
-                self.check_door_interaction()
+
+
 
 
 
@@ -204,42 +214,56 @@ class Player(Grid_Object):
         target_x = self.grid_x + direction[0]
         target_y = self.grid_y + direction[1]
 
+
         for obj in objects_group:
             if obj.grid_x == target_x and obj.grid_y == target_y:
                 self.held_object = obj
+                self.held_object.original_image = ROCK_FLOATING.convert_alpha()
+                self.held_object.resize(self.tile_size)
                 self.held_object.animation_duration = 0.25
 
                 break
 
     def throw(self):
-        if not self.held_object:
-            return
 
-        self.held_object.animation_duration = 0.1
+        if self.energy > 0:
+            if not self.held_object:
+                return
 
-        direction = directions[self.facing]
-        obj = self.held_object
-        obj_x, obj_y = obj.grid_x, obj.grid_y
-        path = []
+            self.held_object.animation_duration = 0.1
 
-        while True:
-            next_x = obj_x + direction[0]
-            next_y = obj_y + direction[1]
+            direction = directions[self.facing]
+            obj = self.held_object
+            obj_x, obj_y = obj.grid_x, obj.grid_y
+            path = []
 
-            if not self.can_move_to_position(next_x, next_y) or ( next_x == self.grid_x and next_y == self.grid_y):
-                break
+            while True:
+                next_x = obj_x + direction[0]
+                next_y = obj_y + direction[1]
 
-            obj_x, obj_y = next_x, next_y
-            path.append((obj_x, obj_y))
+                current_screen_x = self.current_room.x_offset + next_x * self.current_room.TILE_SIZE
+                current_screen_y = self.current_room.y_offset + next_y * self.current_room.TILE_SIZE
+                obj_rect = pygame.Rect(current_screen_x, current_screen_y, self.tile_size, self.tile_size)
 
-        if path:
-            obj.throw_path = path
-            obj.throwing = True
-            obj.throw_timer = 0
+                if not self.can_move_to_position(next_x, next_y) or ( next_x == self.grid_x and next_y == self.grid_y) or self.current_room.check_door_collision(obj_rect):
+                    break
 
+                obj_x, obj_y = next_x, next_y
+                path.append((obj_x, obj_y))
 
+            if path:
+                obj.throw_path = path
+                obj.throwing = True
+                obj.throw_timer = 0
 
+        self.held_object.original_image = ROCK_IMG.convert_alpha()
+        self.held_object.resize(self.tile_size)
         self.held_object = None
+
+
+
+
+
 
 
 

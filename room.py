@@ -38,7 +38,7 @@ class Room:
         #Wywoływane metody przy tworzeniu pokoju:
         self.load_tiles_from_map()
         self.recalc_layout()
-        print(movable_group)
+
 
 
     def load_tiles_from_map(self):
@@ -77,12 +77,12 @@ class Room:
             screen_y = self.y_offset + y * self.TILE_SIZE
 
             door_rect = pygame.Rect(screen_x, screen_y, self.TILE_SIZE, self.TILE_SIZE)
+        if self.movable_group is not None:
+            for object in self.movable_group.sprites():
+                screen_x = self.x_offset + object.rect.x * self.TILE_SIZE
+                screen_y = self.y_offset + object.rect.y * self.TILE_SIZE
 
-        for object in self.movable_group.sprites():
-            screen_x = self.x_offset + object.rect.x * self.TILE_SIZE
-            screen_y = self.y_offset + object.rect.y * self.TILE_SIZE
-
-            collision_rect = pygame.Rect(screen_x, screen_y, self.TILE_SIZE, self.TILE_SIZE)
+                collision_rect = pygame.Rect(screen_x, screen_y, self.TILE_SIZE, self.TILE_SIZE)
 
 
 
@@ -127,8 +127,9 @@ class Room:
             screen_y = self.y_offset + y * self.TILE_SIZE
             collision_rects.append(pygame.Rect(screen_x, screen_y, self.TILE_SIZE, self.TILE_SIZE))
 
-        for x in self.movable_group.sprites():
-            collision_rects.append(pygame.Rect(x.rect.x, x.rect.y, self.TILE_SIZE, self.TILE_SIZE))
+        if self.movable_group is not None:
+            for x in self.movable_group.sprites():
+                collision_rects.append(pygame.Rect(x.rect.x, x.rect.y, self.TILE_SIZE, self.TILE_SIZE))
 
         return collision_rects
 
@@ -177,11 +178,18 @@ class Room:
         for rect in self.get_collision_rects():
             pygame.draw.rect(surface, (255, 0, 0, 100), rect, 2)
 
+    def has_exit(self, direction):
+        """Sprawdź czy pokój ma wyjście w danym kierunku"""
+        return direction in self.exits and self.exits[direction] is not None
+
+    def get_exit_room(self, direction):
+        """Pobierz ID pokoju do którego prowadzi ten kierunek"""
+        return self.exits.get(direction)
 
     def draw(self, surface):
         self.tile_group.draw(surface)
 
-        self.draw_debug_hitboxes(surface)
+        #self.draw_debug_hitboxes(surface)
 
 
 

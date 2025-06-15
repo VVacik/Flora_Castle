@@ -1,50 +1,8 @@
-# import pygame
-# from level_manager import LevelManager
-#
-# pygame.init()
-# screen = pygame.display.set_mode((1280, 720))
-#
-# clock = pygame.time.Clock()
-# running = True
-# fullscreen = False
-# level_manager = LevelManager()
-#
-# dt = 0
-#
-# while running:
-#     for event in pygame.event.get():
-#         if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
-#             running = False
-#
-#
-#         if event.type == pygame.KEYDOWN:
-#             if event.key == pygame.K_F1:
-#                 fullscreen = not fullscreen
-#                 if fullscreen:
-#                     screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
-#                 else:
-#                     screen = pygame.display.set_mode((1280, 720))
-#
-#                 level_manager.recalc_layout()
-#             level_manager.player.handle_event(event)
-#
-#
-#
-#
-#     level_manager.update(dt)
-#     level_manager.draw(screen)
-#
-#
-#     pygame.display.flip()
-#     dt = clock.tick(60) / 1000
-#
-# pygame.quit()
-#
-
 
 import pygame
 from level_manager import LevelManager
 from Menu_Manager import MenuManager
+from music_manager import Music_Manager
 
 pygame.init()
 screen = pygame.display.set_mode((1280, 720))
@@ -61,14 +19,20 @@ PAUSE = "pause"
 
 current_state = MENU
 level_manager = LevelManager()
-menu_manager = MenuManager(1280, 720)
+menu_manager = MenuManager(screen.get_width(), screen.get_height())
 
+
+#Muzyka
+music = Music_Manager()
 dt = 0
 
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+        if current_state == MENU:
+            music.play_track("assets/menu_Soundtrack.mp3")
 
         # Obsługa ESC - różnie w zależności od stanu
         if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
@@ -102,8 +66,9 @@ while running:
             action = menu_manager.handle_event(event)
 
             if action == "start_game":
+                #Nowa Gra
                 current_state = GAME
-                # Tutaj możesz zresetować grę do początku
+
                 level_manager = LevelManager()
 
             elif action == "continue_game":
@@ -128,17 +93,25 @@ while running:
     if current_state == GAME:
         level_manager.update(dt)
 
+
+        music.play_track("assets/soundtrack.mp3")
+
     # Rysowanie w zależności od stanu
     if current_state == MENU or current_state == PAUSE:
         menu_manager.draw(screen)
     elif current_state == GAME:
         level_manager.draw(screen)
 
-        # Opcjonalnie: narysuj wskaźnik pauzy w rogu
+        #Informacja O tym jak wyjść
         if current_state == GAME:
             font = pygame.font.Font(None, 36)
             pause_text = font.render("ESC - Pauza", True, (255, 255, 255))
             screen.blit(pause_text, (10, 10))
+
+            Energy_level = font.render("Energy: ",True, (0, 150, 240) )
+            screen.blit(Energy_level, (20, 50))
+            Energy = font.render(str(level_manager.player.energy), True, (0, 150, 240))
+            screen.blit(Energy, (120, 50))
 
     pygame.display.flip()
     dt = clock.tick(60) / 1000
